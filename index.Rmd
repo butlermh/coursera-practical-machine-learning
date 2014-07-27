@@ -90,8 +90,8 @@ We estimate the out-of-sample error to be **`r tree_out_error` %**. Can we impro
 error.cv <- {Inf}
 for (i in 2:19) {
     prune.data <- prune.misclass(fit1, best=i)
-    pred.cv <- predict(prune.data, newdata=data.cv, type="class")
-    nright = table(pred.cv == data.cv$classe)
+    pred.cv <- predict(prune.data, newdata=train.cv, type="class")
+    nright = table(pred.cv == train.cv$classe)
     error = as.vector(100 * ( 1- nright["TRUE"] / sum(nright)))
     error.cv <- c(error.cv, error) 
 }
@@ -106,6 +106,7 @@ Despite the complexity of the tree in Figure 1, Figure 2 does not indicate overf
 Next we will use a different type of classification and regression tree implemented by rpart, also as proposed by as proposed by [Breiman (4)](#ref4):
 
 ```{r, fig.width=14, fig.height=14}
+library(rpart)
 fit2 <- rpart(classe ~ ., data=training)
 p3 <- predict(fit2, type="class")
 table(training$classe, p3)
@@ -118,7 +119,7 @@ Looking at the trees in Figure 1 and Figure 3 although the diagrams are differen
 
 ```{r}
 cp <- fit2$cp
-plot(cp[,2], cp[,3], typle="l", xlab="Size of tree (number of nodes", ylab="Out of sample error (%)", main="Figure 4: Relationship between tree size and out of sample error")
+plot(cp[,2], cp[,3], type="l", xlab="Size of tree (number of nodes", ylab="Out of sample error (%)", main="Figure 4: Relationship between tree size and out of sample error")
 ```
 Next we estimate the in-sample error:
 
@@ -155,7 +156,7 @@ The in-sample error for the random forest is **`r forest_in_error` %**. This is 
 
 ```{r}
 p6 <- predict(fit3, newdata=train.cv, type="class")
-table(data.cv$classe, p6)
+table(train.cv$classe, p6)
 nright = table(p6 == train.cv$classe)
 forest_out_error = as.vector(100 * (1-nright["TRUE"] / sum(nright)))
 ```
@@ -178,8 +179,8 @@ pml_write_files = function(x){
 if (!file.exists(destDir)) {
     dir.create(destDir)
 }
-p2 <- predict(fit2, newdata=test.s, type="class")
-pml_write_files(p2)
+p7 <- predict(fit3, newdata=test.s, type="class")
+pml_write_files(p7)
 ```
 
 With the random forest model, all twenty classifications correctly matched the test set values at Coursera.

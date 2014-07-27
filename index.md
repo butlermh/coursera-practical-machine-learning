@@ -80,11 +80,11 @@ table(training$classe, p1)
 ```
 ##    p1
 ##        A    B    C    D    E
-##   A 3367  449   17   24   49
-##   B  289 2013  129  227    0
-##   C   37  128 1952  279    0
-##   D   32  555  294 1270  101
-##   E   90  309  149   98 1879
+##   A 3556  236   44   59   11
+##   B  295 1605  424  161  173
+##   C   41  164 2100   86    5
+##   D  165  191  716  788  392
+##   E   21   93   70   70 2271
 ```
 
 ```r
@@ -112,7 +112,7 @@ tree_in_error = as.vector(100 * (1 - nright["TRUE"]/sum(nright)))
 ```
 
 
-We estimate the in-sample error to be **23.7024 %**. Next, how does the tree perform on cross-validation set?
+We estimate the in-sample error to be **24.8744 %**. Next, how does the tree perform on cross-validation set?
 
 
 ```r
@@ -123,11 +123,11 @@ table(train.cv$classe, p2)
 ```
 ##    p2
 ##        A    B    C    D    E
-##   A 1423  204   13    9   25
-##   B  148  868   44   79    0
-##   C   20   60  828  118    0
-##   D   10  226  147  536   45
-##   E   41  128   45   53  815
+##   A 1506  118   24   22    4
+##   B  123  675  192   80   69
+##   C   13   70  872   70    1
+##   D   70   73  313  370  138
+##   E   14   35   27   29  977
 ```
 
 ```r
@@ -136,7 +136,7 @@ tree_out_error = as.vector(100 * (1 - nright["TRUE"]/sum(nright)))
 ```
 
 
-We estimate the out-of-sample error to be **24.0442 %**. Can we improve performance on cross-validation set by pruning?
+We estimate the out-of-sample error to be **25.2336 %**. Can we improve performance on cross-validation set by pruning?
 
 
 ```r
@@ -145,8 +145,8 @@ error.cv <- {
 }
 for (i in 2:19) {
     prune.data <- prune.misclass(fit1, best = i)
-    pred.cv <- predict(prune.data, newdata = data.cv, type = "class")
-    nright = table(pred.cv == data.cv$classe)
+    pred.cv <- predict(prune.data, newdata = train.cv, type = "class")
+    nright = table(pred.cv == train.cv$classe)
     error = as.vector(100 * (1 - nright["TRUE"]/sum(nright)))
     error.cv <- c(error.cv, error)
 }
@@ -154,8 +154,8 @@ error.cv
 ```
 
 ```
-##  [1]   Inf 63.21 50.13 50.13 50.13 50.13 47.41 42.43 42.43 39.78 37.81
-## [12] 34.63 34.63 32.01 32.01 30.40 29.29 28.38 26.05
+##  [1]   Inf 63.40 47.19 47.19 47.19 47.19 42.06 42.06 39.97 36.65 36.65
+## [12] 35.19 33.70 32.64 29.97 29.97 28.85 28.22 27.37
 ```
 
 ```r
@@ -174,6 +174,7 @@ Next we will use a different type of classification and regression tree implemen
 
 
 ```r
+library(rpart)
 fit2 <- rpart(classe ~ ., data = training)
 p3 <- predict(fit2, type = "class")
 table(training$classe, p3)
@@ -182,11 +183,11 @@ table(training$classe, p3)
 ```
 ##    p3
 ##        A    B    C    D    E
-##   A 3439  225   81  131   30
-##   B  322 1769  244  253   70
-##   C   94  284 1954   50   14
-##   D   99  201  398 1340  214
-##   E   25  149  110  188 2053
+##   A 3562  130   42  114   58
+##   B  479 1640  176  285   78
+##   C   56  166 1946  167   61
+##   D  121  204  329 1488  110
+##   E  117  277  183  303 1645
 ```
 
 ```r
@@ -203,17 +204,8 @@ Looking at the trees in Figure 1 and Figure 3 although the diagrams are differen
 
 ```r
 cp <- fit2$cp
-plot(cp[, 2], cp[, 3], typle = "l", xlab = "Size of tree (number of nodes", 
-    ylab = "Out of sample error (%)", main = "Figure 4: Relationship between tree size and out of sample error")
-```
-
-```
-## Warning: "typle" is not a graphical parameter
-## Warning: "typle" is not a graphical parameter
-## Warning: "typle" is not a graphical parameter
-## Warning: "typle" is not a graphical parameter
-## Warning: "typle" is not a graphical parameter
-## Warning: "typle" is not a graphical parameter
+plot(cp[, 2], cp[, 3], type = "l", xlab = "Size of tree (number of nodes", ylab = "Out of sample error (%)", 
+    main = "Figure 4: Relationship between tree size and out of sample error")
 ```
 
 ![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11.png) 
@@ -227,7 +219,7 @@ rpart_in_error = as.vector(100 * (1 - nright["TRUE"]/sum(nright)))
 ```
 
 
-We estimate the in-sample error to be **23.1637 %** so it does slightly better than the `tree` package. Next, how does the tree perform on cross-validation set?
+We estimate the in-sample error to be **25.1583 %** so it does slightly better than the `tree` package. Next, how does the tree perform on cross-validation set?
 
 
 ```r
@@ -238,11 +230,11 @@ table(train.cv$classe, p4)
 ```
 ##    p4
 ##        A    B    C    D    E
-##   A 1451  107   27   71   18
-##   B  142  752   88  106   51
-##   C   41  133  823   24    5
-##   D   35   82  182  561  104
-##   E   11   67   40   67  897
+##   A 1521   50   17   69   17
+##   B  209  702   67  120   41
+##   C   22   76  816   84   28
+##   D   43   83  144  659   35
+##   E   53  122  113  126  668
 ```
 
 ```r
@@ -251,15 +243,103 @@ rpart_out_error = as.vector(100 * (1 - nright["TRUE"]/sum(nright)))
 ```
 
 
-We estimate the out-of-sample error to be **23.8063 %**. Again this is an improvement on `tree`. 
+We estimate the out-of-sample error to be **25.8114 %**. Again this is an improvement on `tree`. 
 
 ### Random forests
 
 Next we apply random forests also proposed by [Breiman (6)](#ref6) and [Breiman (7)](#ref7):
 
 
+```r
+library(randomForest)
+fit3 <- randomForest(classe ~ ., data = training, method = "class")
+p5 <- predict(fit3, type = "class")
+table(training$classe, p5)
+```
+
+```
+##    p5
+##        A    B    C    D    E
+##   A 3905    0    0    0    1
+##   B    5 2651    2    0    0
+##   C    0    5 2391    0    0
+##   D    0    0   11 2241    0
+##   E    0    0    0    6 2519
+```
+
+```r
+nright = table(p5 == training$classe)
+forest_in_error = as.vector(100 * (1 - nright["TRUE"]/sum(nright)))
+```
 
 
+The in-sample error for the random forest is **0.2184 %**. This is a big improvement over the two previous tree based methods. How does the forest perform on cross-validation set?
 
 
+```r
+p6 <- predict(fit3, newdata = train.cv, type = "class")
+table(train.cv$classe, p6)
+```
 
+```
+##    p6
+##        A    B    C    D    E
+##   A 1674    0    0    0    0
+##   B    3 1136    0    0    0
+##   C    0    1 1024    1    0
+##   D    0    0    8  956    0
+##   E    0    0    0    5 1077
+```
+
+```r
+nright = table(p6 == train.cv$classe)
+forest_out_error = as.vector(100 * (1 - nright["TRUE"]/sum(nright)))
+```
+
+
+The out-of-sample error for the random forest is **0.3059 %**. Again this is much better than the previous tree based methods. 
+
+## Results
+
+The random forest clearly performs better, approaching 99% accuracy for in-sample and out-of-sample error so we will select this model and apply it to the test data set. We use the provided function to classify 20 data points from the test set by the type of lift. We then upload these classifications to Coursera to confirm that the model is working correctly.
+
+
+```r
+destDir = "./output"
+pml_write_files = function(x) {
+    n = length(x)
+    for (i in 1:n) {
+        filename = paste0(destDir, "/", "problem_id_", i, ".txt")
+        write.table(x[i], file = filename, quote = FALSE, row.names = FALSE, 
+            col.names = FALSE)
+    }
+}
+if (!file.exists(destDir)) {
+    dir.create(destDir)
+}
+p7 <- predict(fit3, newdata = test.s, type = "class")
+pml_write_files(p7)
+```
+
+
+With the random forest model, all twenty classifications correctly matched the test set values at Coursera.
+
+## Conclusions
+
+In this report we created three different classification models, using `tree`, `rpart` and `randomForest` for a data set of barbell lifts. We found the `randomForest` model performed the best, approaching accuracy of 99% for the out-of-sample data set. Using this model, we were able to correctly classify all twenty values from the test data set.
+
+## References
+
+<a name="ref1"></a>[1] Dataset [http://groupware.les.inf.puc-rio.br/har](http://groupware.les.inf.puc-rio.br/har)
+
+<a name="ref2"></a>[2] Training data set [https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv)
+
+<a name="ref3"></a>[3] Testing data set [https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv)
+
+<a name="ref4"></a>[4]  Breiman L., Friedman J. H., Olshen R. A., and Stone, C. J. (1984), Classification and Regression Trees. Wadsworth.
+
+<a name="ref5"></a>[5] Ripley, B. D. (1996), Pattern Recognition and Neural Networks., Cambridge University Press, Cambridge. Chapter 7.
+
+<a name="ref6"></a>[6] Breiman, L. (2001), Random Forests, Machine Learning 45(1), 5-32.
+
+<a name="ref7"></a>[7] Breiman, L (2002), Manual On Setting Up, Using, And Understanding Random Forests V3.1, [ http://oz.berkeley.edu/users/breiman/Using_random_forests_V3.1.pdf]( http://oz.berkeley.edu/users/breiman/Using_random_forests_V3.1.pdf)
